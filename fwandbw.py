@@ -23,14 +23,33 @@ def one_hot_encode(y, num_classes=10):
 y_train_ohe = one_hot_encode(y_train)
 y_test_ohe = one_hot_encode(y_test)
 
+import numpy as np
+
 class NeuralNet:
+    """
+    A simple feedforward neural network implementation supporting various optimizers.
+
+    Attributes:
+        layers (list): List of layer sizes.
+        learning_rate (float): Learning rate for weight updates.
+        optimizer (str): Optimization algorithm ("sgd", "momentum", "nesterov", "rmsprop", "adam").
+        weights (list): List of weight matrices for each layer.
+        biases (list): List of bias vectors for each layer.
+        velocities_w (list): Momentum velocities for weights.
+        velocities_b (list): Momentum velocities for biases.
+        m_w, v_w (list): First and second moment estimates for Adam optimizer.
+        m_b, v_b (list): First and second moment estimates for Adam optimizer (bias terms).
+        t (int): Time step counter for Adam optimizer.
+    """
     def __init__(self, layers, learning_rate=0.01, optimizer="sgd"):
+        """Initializes the neural network with given layers, learning rate, and optimizer."""
         self.layers = layers
         self.learning_rate = learning_rate
         self.optimizer = optimizer
         self.initialize_weights()
 
     def initialize_weights(self):
+        """Initializes weights and biases for all layers, and sets up optimizer-specific variables."""
         self.weights = []
         self.biases = []
 
@@ -38,6 +57,7 @@ class NeuralNet:
             self.weights.append(np.random.randn(self.layers[i], self.layers[i+1]) * 0.01)
             self.biases.append(np.zeros((1, self.layers[i+1])))
 
+        # Variables for optimizers
         self.velocities_w = [np.zeros_like(w) for w in self.weights]
         self.velocities_b = [np.zeros_like(b) for b in self.biases]
         self.m_w, self.v_w = [np.zeros_like(w) for w in self.weights], [np.zeros_like(w) for w in self.weights]
@@ -45,13 +65,16 @@ class NeuralNet:
         self.t = 1
 
     def relu(self, x):
+        """ReLU activation function."""
         return np.maximum(0, x)
 
     def softmax(self, x):
+        """Softmax activation function for multi-class classification."""
         exp_x = np.exp(x - np.max(x, axis=1, keepdims=True))
         return exp_x / np.sum(exp_x, axis=1, keepdims=True)
 
     def forward(self, x):
+        """Performs forward propagation through the network."""
         self.activations = [x]
         for i in range(len(self.weights) - 1):
             x = self.relu(np.dot(x, self.weights[i]) + self.biases[i])
@@ -61,6 +84,7 @@ class NeuralNet:
         return x
 
     def backward(self, x, y):
+        """Performs backpropagation to compute gradients."""
         m = y.shape[0]
         grads_w = [np.zeros_like(w) for w in self.weights]
         grads_b = [np.zeros_like(b) for b in self.biases]
@@ -77,6 +101,7 @@ class NeuralNet:
         self.update_weights(grads_w, grads_b)
 
     def update_weights(self, grads_w, grads_b):
+        """Updates weights and biases based on the selected optimizer."""
         if self.optimizer == "sgd":
             for i in range(len(self.weights)):
                 self.weights[i] -= self.learning_rate * grads_w[i]
@@ -110,6 +135,7 @@ class NeuralNet:
         self.t += 1
 
     def train(self, x, y, epochs=10, batch_size=64):
+        """Trains the neural network using mini-batch gradient descent."""
         for epoch in range(epochs):
             indices = np.arange(x.shape[0])
             np.random.shuffle(indices)
@@ -125,8 +151,8 @@ class NeuralNet:
             loss = -np.mean(np.sum(y * np.log(y_pred + 1e-8), axis=1))
             print(f"Epoch {epoch+1}/{epochs}, Loss: {loss:.4f}")
 
-
     def evaluate(self, x, y):
+        """Evaluates the model on test data and prints accuracy."""
         y_pred = self.forward(x)
         accuracy = np.mean(np.argmax(y_pred, axis=1) == np.argmax(y, axis=1))
         print(f"Test Accuracy: {accuracy * 100:.2f}%")
