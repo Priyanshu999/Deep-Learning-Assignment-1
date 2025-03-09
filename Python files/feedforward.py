@@ -18,29 +18,36 @@ class MLP:
         self.X, self.Y = X, Y
         self.n_samples = len(X)
         self.layers = layers
-        self.weights = {}
+        self.weights = self.initialize_weights()
 
-        for i in range(len(layers) - 1):
-            self.weights[f'w{i+1}'] = np.random.randn(layers[i], layers[i+1])
-            self.weights[f'b{i+1}'] = np.zeros((1, layers[i+1]))
+    def initialize_weights(self):
+        weights = {}
+        for i in range(len(self.layers) - 1):
+            weights[f'w{i+1}'] = np.random.randn(self.layers[i], self.layers[i+1])
+            weights[f'b{i+1}'] = np.zeros((1, self.layers[i+1]))
+        return weights
 
-    def activate_relu(self, z):
-        return np.maximum(0, z)
+    def activate(self, z, activation_type):
+        if activation_type == 'relu':
+            return np.maximum(0, z)
+        elif activation_type == 'sigmoid':
+            return 1 / (1 + np.exp(-z))
+        elif activation_type == 'softmax':
+            exp_vals = np.exp(z - np.max(z, axis=1, keepdims=True))
+            return exp_vals / np.sum(exp_vals, axis=1, keepdims=True)
+        else:
+            raise ValueError("Unsupported activation type")
 
-    def activate_sigmoid(self, z):
-        return 1 / (1 + np.exp(-z))
-
-    def activate_softmax(self, z):
-        exp_vals = np.exp(z - np.max(z, axis=1, keepdims=True))
-        return exp_vals / np.sum(exp_vals, axis=1, keepdims=True)
+    def compute_layer_output(self, input_data, weight_key, bias_key, activation_type):
+        z = np.dot(input_data, self.weights[weight_key]) + self.weights[bias_key]
+        return self.activate(z, activation_type)
 
     def forward_pass(self, data):
-        activations = []
+        activations = data
         for i in range(len(self.layers) - 1):
-            z = np.dot(data if i == 0 else activations[-1], self.weights[f'w{i+1}']) + self.weights[f'b{i+1}']
-            a = self.activate_sigmoid(z) if i < len(self.layers) - 2 else self.activate_softmax(z)
-            activations.append(a)
-        return activations[-1]
+            activation_type = 'sigmoid' if i < len(self.layers) - 2 else 'softmax'
+            activations = self.compute_layer_output(activations, f'w{i+1}', f'b{i+1}', activation_type)
+        return activations
 
 #loading the data from fashion_mnist dataset
 (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
@@ -51,8 +58,8 @@ test_images = test_images.reshape(test_images.shape[0], -1) / 255.0
 train_labels_one_hot = np.eye(10)[train_labels]
 test_labels_one_hot = np.eye(10)[test_labels]
 
-#Any number of layers and their sizes can be given here
-layer_sizes = [train_images.shape[1], 128, 64, 32, 10]  # Input, hidden1, hidden2,hidden3 output
+#any number of layers and their sizes can be given
+layer_sizes = [train_images.shape[1], 128, 64, 32, 10]
 
 #initialize, train and test our feedforward only model
 mlp = MLP(train_images, train_labels_one_hot, layer_sizes)
@@ -63,3 +70,4 @@ print(feedForwardOutput[10])
 
 print("True label value of Image:")
 print(test_labels_one_hot[10])
+
