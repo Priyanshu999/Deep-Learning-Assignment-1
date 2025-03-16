@@ -179,6 +179,7 @@ class Optimizer:
 
         self.t += 1
 
+
 class ActivationFunctions:
     @staticmethod
     def relu(x):
@@ -236,8 +237,33 @@ y_test_ohe = one_hot_encode(y_test)
 
 
 # Define Neural Network class
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from keras.datasets import fashion_mnist
+
+(x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
+
+# Normalizing images
+x_train = x_train.reshape(x_train.shape[0], -1) / 255.0
+x_test = x_test.reshape(x_test.shape[0], -1) / 255.0
+
+split_index = int(0.9*x_train.shape[0])
+x_train, x_val = x_train[:split_index], x_train[split_index:]
+y_train, y_val = y_train[:split_index], y_train[split_index:]
+
+# One-hot encoding labels
+def one_hot_encode(y, num_classes=10):
+    return np.eye(num_classes)[y]
+
+y_train_ohe = one_hot_encode(y_train)
+y_val_ohe = one_hot_encode(y_val)
+y_test_ohe = one_hot_encode(y_test)
+
+
+# Define Neural Network class
 class NeuralNetwork:
-    def __init__(self, layers, learning_rate=0.01, optimizer="sgd", weight_decay=0.0, weight_init="random", activation="relu", loss="cross_entropy", momentum=0.9, beta=1, beta1=0.9, beta2=0.99, epsilon=1e-8):
+    def __init__(self, layers, learning_rate=0.01, optimizer="sgd", weight_decay=0.0, weight_init="random", activation="relu", loss="cross_entropy", momentum=0.9, beta=1, beta1=0.9, beta2=0.99, epsilon=1e-8, wandb_run=None):
         self.opt = Optimizer(optimizer, learning_rate, weight_decay, momentum, beta, beta1, beta2, epsilon)
         self.layers = layers
         self.learning_rate = learning_rate
@@ -247,6 +273,7 @@ class NeuralNetwork:
         self.activation = activation.lower()
         self.initialize_weights()
         self.loss = loss
+        self.wandb_run=wandb_run
 
     def initialize_weights(self):
         self.weights = []
@@ -414,13 +441,14 @@ class NeuralNetwork:
             val_accuracy = np.mean(np.argmax(y_pred_val, axis=1) == np.argmax(y_val, axis=1))
 
             # Log metrics to Weights & Biases
-            wandb.log({
-                "epoch": epoch + 1,
-                "Train Loss": train_loss,
-                "Train Accuracy": train_accuracy,
-                "Validation Loss": val_loss,
-                "Validation Accuracy": val_accuracy
-            })
+            if self.wandb_run:  # Ensure wandb is initialized
+                self.wandb_run.log({
+                    "epoch": epoch + 1,
+                    "Train Loss": train_loss,
+                    "Train Accuracy": train_accuracy,
+                    "Validation Loss": val_loss,
+                    "Validation Accuracy": val_accuracy
+                })
 
             # Print metrics
             print(f"Epoch {epoch+1}/{epochs} - Train Acc: {train_accuracy:.4f}, Train Loss: {train_loss:.4f}, "
@@ -548,10 +576,9 @@ sweep_config = {
     }
 }
 sweep_id = wandb.sweep(sweep_config, project="DA6401_Assignment1")
-wandb.agent(sweep_id, function=lambda: train_sweep("cross_entropy"), count=150)
+wandb.agent(sweep_id, function=lambda: train_sweep("cross_entropy"), count=300)
 
-# Best parameters:
-#  (test accuracy: 88.69%)
+# Best parameters: (test accuracy: 88.69%)
 # wandb: Agent Starting Run: 3cbkqjj4 with config:
 # wandb: 	activation: relu
 # wandb: 	batch_size: 64
@@ -627,8 +654,8 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
 # Assuming you have the true and predicted labels
-# y_true = ...  # Replace with actual test labels
-# y_pred = ...  # Replace with model predictions
+y_true = ...  # Replace with actual test labels
+y_pred = ...  # Replace with model predictions
 
 # Compute the confusion matrix
 cm = confusion_matrix(y_true, y_pred)
@@ -697,7 +724,7 @@ sweep_config = {
         "activation": {"values": ["sigmoid", "tanh", "relu"]}
     }
 }
-sweep_id = wandb.sweep(sweep_config, project="DA6401_Assignment1+")
+sweep_id = wandb.sweep(sweep_config, project="DA6401_Assignment2")
 wandb.agent(sweep_id, function=lambda: train_sweep("cross_entropy"), count=100)
 
 

@@ -13,7 +13,6 @@ def main():
     
     parser = argparse.ArgumentParser(description="Train a Neural Network with wandb logging")
 
-    # Required wandb args
     parser.add_argument("-wp", "--wandb_project", type=str, default="myprojectname", help="Wandb project name")
     parser.add_argument("-we", "--wandb_entity", type=str, default="myname", help="Wandb entity name")
 
@@ -37,7 +36,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Initialize wandb
     # wandb.init(project=args.wandb_project, entity=args.wandb_entity)
 
     if args.dataset == "mnist":
@@ -64,14 +62,12 @@ def main():
       run=wandb.init(project=args.wandb_project, entity=args.wandb_entity)
       config = wandb.config
 
-      # Generate a custom run name
       run_name = f"hl_{config.hidden_layers}_bs_{config.batch_size}_ac_{config.activation}_ls_{losse}_lr_{config.learning_rate}_opt_{config.optimizer}_init_{config.weight_init}"
       wandb.run.name = run_name
       # wandb.run.save()
 
       loss_function = losse
 
-      # Initialize and train the model
       model = NeuralNetwork(
           layers=[784] + [config.layer_size]*config.hidden_layers + [10],
           learning_rate=config.learning_rate,
@@ -84,10 +80,8 @@ def main():
       )
       model.train(x_train, y_train_ohe, x_val, y_val_ohe, epochs=config.epochs, batch_size=config.batch_size)
 
-      # Evaluate on test data after training
       test_loss, test_accuracy, y_true, y_pred = model.evaluate(x_test, y_test_ohe)
 
-      # Log final test metrics
       # wandb.log({"Test Loss": test_loss, "Test Accuracy": test_accuracy})
 
       print(f"Final Test Accuracy: {test_accuracy:.4f}, Test Loss: {test_loss:.4f}")
