@@ -1,4 +1,5 @@
 [![Project Report](https://img.shields.io/badge/Project%20Report-Click%20Here-blue?style=for-the-badge)](https://wandb.ai/cs24m035-indian-institute-of-technology-madras/DA6401_Assignment_newtry/reports/DA6401-Assignment-1--VmlldzoxMTgyMzcwMg?accessToken=109w2dy282m8c1pv9i2mngh7vi17kge189s34psr3gsjrs5pkpatykacrplr9wj2)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/Priyanshu999/Deep-Learning-Assignment-1)
 
 # Project Repository 📂
 
@@ -108,17 +109,17 @@ python train.py --wandb_entity myname --wandb_project myprojectname
 | `-d`, `--dataset` | fashion_mnist | choices:  ["mnist", "fashion_mnist"] |
 | `-e`, `--epochs` | 10 |  Number of epochs to train neural network.|
 | `-b`, `--batch_size` | 64 | Batch size used to train neural network. | 
-| `-l`, `--loss` | cross_entropy | choices:  ["mean_squared_error", "cross_entropy"] |
-| `-o`, `--optimizer` | adam | choices:  ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"] | 
+| `-l`, `--loss` | cross_entropy | choices:  ["squared_error", "cross_entropy"] |
+| `-o`, `--optimizer` | adam | choices:  ["sgd", "momentum", "nesterov", "rmsprop", "adam", "nadam"] | 
 | `-lr`, `--learning_rate` | 0.001 | Learning rate used to optimize model parameters | 
-| `-m`, `--momentum` | 0.1 | Momentum used by momentum and nag optimizers. |
-| `-beta`, `--beta` | 0.9 | Beta used by rmsprop optimizer | 
-| `-beta1`, `--beta1` | 0.99 | Beta1 used by adam and nadam optimizers. | 
+| `-m`, `--momentum` | 0.9 | Momentum used by momentum and nag optimizers. |
+| `-beta`, `--beta` | 1 | Beta used by rmsprop optimizer | 
+| `-beta1`, `--beta1` | 0.9 | Beta1 used by adam and nadam optimizers. | 
 | `-beta2`, `--beta2` | 0.99 | Beta2 used by adam and nadam optimizers. |
-| `-eps`, `--epsilon` | 0.000001 | Epsilon used by optimizers. |
+| `-eps`, `--epsilon` | 1e-8 | Epsilon used by optimizers. |
 | `-w_d`, `--weight_decay` | .0 | Weight decay used by optimizers. |
-| `-w_i`, `--weight_init` | random | choices:  ["random", "Xavier"] | 
-| `-nhl`, `--num_layers` | 5 | Number of hidden layers used in feedforward neural network. | 
+| `-w_i`, `--weight_init` | xavier | choices:  ["random", "Xavier"] | 
+| `-nhl`, `--num_layers` | 4 | Number of hidden layers used in feedforward neural network. | 
 | `-sz`, `--hidden_size` | 128 | Number of hidden neurons in a feedforward layer. |
 | `-a`, `--activation` | relu | choices:  ["identity", "sigmoid", "tanh", "ReLU"] |
 
