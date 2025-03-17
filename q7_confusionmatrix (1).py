@@ -426,3 +426,22 @@ plt.title("confusion_matrix", fontsize=14)
 
 plt.show()
 
+import wandb
+wandb.login(key="6ae5555f295dc1469adf2104179b22cabc458450")
+
+labels = ["T-shirt", "Trouser", "Pullover", "Dress", "Coat",
+          "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
+
+
+
+import wandb
+
+run = wandb.init(project="DA6401_Assignment_newtry")
+
+wandb.log({"conf_mat" : wandb.plot.confusion_matrix(probs=None,
+                        y_true=y_true, preds=y_pred,
+                        class_names=labels)})
+
+
+run.finish()
+
