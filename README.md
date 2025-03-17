@@ -1,4 +1,4 @@
-[![Project Report](https://img.shields.io/badge/Project%20Report-Click%20Here-blue?style=for-the-badge)](https://wandb.ai/cs24m035-indian-institute-of-technology-madras/DA6401_Assignment_newtry/reports/DA6401-Assignment-1--VmlldzoxMTgyMzcwMg)
+[![Project Report](https://img.shields.io/badge/Project%20Report-Click%20Here-blue?style=for-the-badge)](https://wandb.ai/cs24m035-indian-institute-of-technology-madras/DA6401_Assignment_newtry/reports/DA6401-Assignment-1--VmlldzoxMTgyMzcwMg?accessToken=109w2dy282m8c1pv9i2mngh7vi17kge189s34psr3gsjrs5pkpatykacrplr9wj2)
 
 # Project Repository 📂
 
